@@ -16,23 +16,6 @@ led5 = Pin(12, Pin.OUT)
 led6 = Pin(13, Pin.OUT)
 led7 = Pin(2, Pin.OUT)
 
-import network
-ssid = "Devarsh"
-password = "Shital@9825569091"
-
-sta = network.WLAN(network.STA_IF)
-if not sta.isconnected():
-    print('connecting to network...')
-    sta.active(True)
-    sta.connect(ssid,password)
-    while not sta.isconnected():
-        pass
-print('network config:', sta.ifconfig())
-
-def reset():
-    print("rebooting controller...")
-    machine.reset()
-
 #mac address of the chip
 mac_address= ubinascii.hexlify(network.WLAN().config('mac'),':').decode()
 
@@ -46,6 +29,11 @@ CONFIG = {
      "SUBTOPIC": b"espsub",   
 }
 
+def reset():
+    print("rebooting controller...")
+    client.publish(CONFIG["SUBTOPIC"], "Rebooting Device...")
+    machine.reset()
+    
 #Act based on received command & publish status of respective LED
 def onMessage(topic, msg):
     print("Topic: %s, Message: %s" % (topic, msg))
@@ -63,7 +51,6 @@ def onMessage(topic, msg):
                         gpiolist[j].off()
                         dictn[lst[j]]='0'
                     elif 're' in i and lst[j] in i:
-                        print("Rebooting Device...")
                         reset()
                         
 #dictionary is converted to json data             
@@ -74,11 +61,8 @@ def onMessage(topic, msg):
         except :
             print("Error Raised Invalid Json...")
             print("Please enter valid json format")
-
             break
             
-            
-
 def Listen():
     #instance of MQTTClient
     
@@ -90,10 +74,7 @@ def Listen():
     try:
         while True:
             #msg = client.wait_msg()
-            msg = (client.check_msg())
-          
-          
-          
+            msg = (client.check_msg())          
     finally:
             client.disconnect()
 
@@ -105,7 +86,7 @@ client.publish(CONFIG["SUBTOPIC"], PUB_MSG)
 
 #Lists
 lst=['L0','L1','L2','L3','L4','L5','L6','L7','L8']
-gpiolist =[led0, led1, led2, led3, led4, led5, led6, led7]
+gpiolist =[led0, led1, led2, led3, led4, led5, led6, led7, reset()]
 
 #publish initial state data
 for j in range(0,8):
@@ -117,4 +98,4 @@ for j in range(0,8):
 message=json.dumps(dictn)
 client.publish(CONFIG["SUBTOPIC"], message)
 
-Listen()
+Listen() 
