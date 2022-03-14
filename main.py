@@ -1,9 +1,9 @@
 import time
 from machine import Pin
-led=Pin(2,Pin.OUT)        #create LED object from pin2,Set Pin2 to output
+led=Pin(2,Pin.OUT)
 
 while True:
-  led.value(1)            #Set led turn on
+  led.value(1)
   time.sleep(1)
-  led.value(0)            #Set led turn off
+  led.value(0)
   time.sleep(1)
