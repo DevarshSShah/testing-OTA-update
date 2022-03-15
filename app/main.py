@@ -30,7 +30,7 @@ CONFIG = {
      "SUBTOPIC": b"espsub",   
 }
 
-def reset(msecs):  
+def deep_sleep(msecs):  
   rtc = machine.RTC()  # configure RTC.ALARM0 to be able to wake the device
   rtc.irq(trigger=rtc.ALARM0, wake=machine.DEEPSLEEP)
   rtc.alarm(rtc.ALARM0, msecs) # set RTC.ALARM0 to fire after X milliseconds (waking the device)
@@ -52,10 +52,11 @@ def onMessage(topic, msg):
                     elif '0' in i and lst[j] in i:
                         gpiolist[j].off()
                         dictn[lst[j]]='0'
-                    elif 're' in i and lst[j] in i:
+                    elif "b're'" in i and lst[j] in i:
                         print("Rebooting device...")
-                        client.publish(CONFIG["SUBTOPIC"],message)                        
-                        reset(5000)
+                        client.publish(CONFIG["SUBTOPIC"],"Rebooting Device")
+                        sleep(2)
+                        deep_sleep(5000)
                         
 #dictionary is converted to json data             
             message=json.dumps(dictn)
