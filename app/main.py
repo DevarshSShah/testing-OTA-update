@@ -52,7 +52,7 @@ def onMessage(topic, msg):
                     elif '0' in i and lst[j] in i:
                         gpiolist[j].off()
                         dictn[lst[j]]='0'
-                    elif "b're'" in i and lst[j] in i:
+                    elif 're' in i:
                         print("Rebooting device...")
                         client.publish(CONFIG["SUBTOPIC"],"Rebooting Device")
                         sleep(2)
