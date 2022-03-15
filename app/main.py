@@ -47,8 +47,6 @@ if not sta.isconnected():
         pass
 print('Connected to WiFi')
 print('network config:', sta.ifconfig())
-print('Your code has been updated succesfully Test successfull')
-print('Final Test Successfull')
 
 #Connecting to the mqtt broker
 client = MQTTClient(mac_address, CONFIG['MQTT_BROKER'], user=CONFIG['USER'], password=CONFIG['PASSWORD'], port=CONFIG['PORT'])
