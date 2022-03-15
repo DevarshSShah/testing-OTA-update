@@ -1,3 +1,5 @@
+#Updated Code for rebooting device using MQTT
+
 from umqtt.simple import MQTTClient
 from machine import Pin
 import machine
@@ -8,7 +10,7 @@ import network
 import json
 
 dictn={}
-led0 = Pin(16, Pin.OUT)
+led0 = Pin(15, Pin.OUT)
 led1 = Pin(5, Pin.OUT)
 led2 = Pin(4, Pin.OUT)
 led3 = Pin(0, Pin.OUT)
@@ -30,12 +32,34 @@ CONFIG = {
      "SUBTOPIC": b"espsub",   
 }
 
-def deep_sleep(msecs):  
-  rtc = machine.RTC()  # configure RTC.ALARM0 to be able to wake the device
-  rtc.irq(trigger=rtc.ALARM0, wake=machine.DEEPSLEEP)
-  rtc.alarm(rtc.ALARM0, msecs) # set RTC.ALARM0 to fire after X milliseconds (waking the device)
-  machine.deepsleep()
+#wifi
+ssid = "Devarsh"
+password = "Shital@9825569091"
+
+sta = network.WLAN(network.STA_IF)
+if not sta.isconnected():
+    print('connecting to network...')
+    sta.active(True)
+    sta.connect(ssid,password)
+    while not sta.isconnected():
+        pass
+print('Connected to WiFi')
+print('network config:', sta.ifconfig())
+
+#Connecting to the mqtt broker
+client = MQTTClient(mac_address, CONFIG['MQTT_BROKER'], user=CONFIG['USER'], password=CONFIG['PASSWORD'], port=CONFIG['PORT'])
+client.connect()
+PUB_MSG="ESP8266 is Connected and it's mac address is: %s"%mac_address
+client.publish(CONFIG["SUBTOPIC"], PUB_MSG)
+
+#reboot
+def deep_sleep(msecs):
+    rtc = machine.RTC()  # configure RTC.ALARM0 to be able to wake the device
+    rtc.irq(trigger=rtc.ALARM0, wake=machine.DEEPSLEEP)
+    rtc.alarm(rtc.ALARM0, msecs) # set RTC.ALARM0 to fire after X milliseconds (waking the device)
+    machine.deepsleep()
     
+
 #Act based on received command & publish status of respective LED
 def onMessage(topic, msg):
     print("Topic: %s, Message: %s" % (topic, msg))
@@ -52,11 +76,12 @@ def onMessage(topic, msg):
                     elif '0' in i and lst[j] in i:
                         gpiolist[j].off()
                         dictn[lst[j]]='0'
-                    elif "reboot" in i and lst[j] in i:
+                    elif "2" in i and lst[j] in i:
                         print("Rebooting device...")
                         client.publish(CONFIG["SUBTOPIC"],"Rebooting Device")
                         sleep(2)
-                        gpiolist[j]
+                        deep_sleep(5000)
+                        
                         
 #dictionary is converted to json data             
             message=json.dumps(dictn)
@@ -83,15 +108,9 @@ def Listen():
     finally:
             client.disconnect()
 
-#Connecting to the mqtt broker
-client = MQTTClient(mac_address, CONFIG['MQTT_BROKER'], user=CONFIG['USER'], password=CONFIG['PASSWORD'], port=CONFIG['PORT'])
-client.connect()
-PUB_MSG="ESP8266 is Connected and it's mac address is: %s"%mac_address
-client.publish(CONFIG["SUBTOPIC"], PUB_MSG)
-
 #Lists
 lst=['L0','L1','L2','L3','L4','L5','L6','L7','L8']
-gpiolist =[led0, led1, led2, led3, led4, led5, led6, led7, deep_sleep(5000)]
+gpiolist =[led0, led1, led2, led3, led4, led5, led6, led7]
 
 #publish initial state data
 for j in range(0,8):
