@@ -30,10 +30,11 @@ CONFIG = {
      "SUBTOPIC": b"espsub",   
 }
 
-#def reset():
- #   print("rebooting controller...")
-   # client.publish(CONFIG["SUBTOPIC"], "Rebooting Device...")
-  #  machine.deepsleep(5000)
+def reset(msecs):  
+  rtc = machine.RTC()  # configure RTC.ALARM0 to be able to wake the device
+  rtc.irq(trigger=rtc.ALARM0, wake=machine.DEEPSLEEP)
+  rtc.alarm(rtc.ALARM0, msecs) # set RTC.ALARM0 to fire after X milliseconds (waking the device)
+  machine.deepsleep()
     
 #Act based on received command & publish status of respective LED
 def onMessage(topic, msg):
@@ -51,8 +52,10 @@ def onMessage(topic, msg):
                     elif '0' in i and lst[j] in i:
                         gpiolist[j].off()
                         dictn[lst[j]]='0'
-                    #elif 're' in i and lst[j] in i:
-                     #   reset()
+                    elif 're' in i and lst[j] in i:
+                        print("Rebooting device...")
+                        client.publish(CONFIG["SUBTOPIC"],message)                        
+                        reset(5000)
                         
 #dictionary is converted to json data             
             message=json.dumps(dictn)
@@ -87,7 +90,7 @@ client.publish(CONFIG["SUBTOPIC"], PUB_MSG)
 
 #Lists
 lst=['L0','L1','L2','L3','L4','L5','L6','L7','L8']
-gpiolist =[led0, led1, led2, led3, led4, led5, led6, led7, reset()]
+gpiolist =[led0, led1, led2, led3, led4, led5, led6, led7]
 
 #publish initial state data
 for j in range(0,8):
