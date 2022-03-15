@@ -52,11 +52,11 @@ def onMessage(topic, msg):
                     elif '0' in i and lst[j] in i:
                         gpiolist[j].off()
                         dictn[lst[j]]='0'
-                    elif 're' in i:
+                    elif "reboot" in i and lst[j] in i:
                         print("Rebooting device...")
                         client.publish(CONFIG["SUBTOPIC"],"Rebooting Device")
                         sleep(2)
-                        deep_sleep(5000)
+                        gpiolist[j]
                         
 #dictionary is converted to json data             
             message=json.dumps(dictn)
@@ -91,7 +91,7 @@ client.publish(CONFIG["SUBTOPIC"], PUB_MSG)
 
 #Lists
 lst=['L0','L1','L2','L3','L4','L5','L6','L7','L8']
-gpiolist =[led0, led1, led2, led3, led4, led5, led6, led7]
+gpiolist =[led0, led1, led2, led3, led4, led5, led6, led7, deep_sleep(5000)]
 
 #publish initial state data
 for j in range(0,8):
@@ -103,4 +103,4 @@ for j in range(0,8):
 message=json.dumps(dictn)
 client.publish(CONFIG["SUBTOPIC"], message)
 
-Listen() 
+Listen()
