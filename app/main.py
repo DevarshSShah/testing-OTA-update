@@ -80,9 +80,9 @@ def onMessage(topic, msg):
                         dictn[lst[j]]='0'
                     elif "2" in i and lst[j] in i:
                         print("Rebooting device...")
-                        client.publish(CONFIG["SUBTOPIC"],"Rebooting Device")
+                        client.publish(CONFIG["SUBTOPIC"],"Rebooting Device...")
                         sleep(2)
-                        deep_sleep(5000)
+                        deep_sleep(2000)
                         
                         
 #dictionary is converted to json data             
