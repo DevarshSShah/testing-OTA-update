@@ -1,4 +1,5 @@
 #Updated Code for rebooting device using MQTT
+#testing if code has been updated or not
 
 from umqtt.simple import MQTTClient
 from machine import Pin
@@ -45,6 +46,7 @@ if not sta.isconnected():
         pass
 print('Connected to WiFi')
 print('network config:', sta.ifconfig())
+print('Your code has been updated succesfully')
 
 #Connecting to the mqtt broker
 client = MQTTClient(mac_address, CONFIG['MQTT_BROKER'], user=CONFIG['USER'], password=CONFIG['PASSWORD'], port=CONFIG['PORT'])
