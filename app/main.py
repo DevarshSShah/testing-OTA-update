@@ -3,6 +3,7 @@ from machine import Pin
 import machine
 import ubinascii
 import time
+from time import sleep
 import network
 import json
 
@@ -29,10 +30,10 @@ CONFIG = {
      "SUBTOPIC": b"espsub",   
 }
 
-def reset():
-    print("rebooting controller...")
-    client.publish(CONFIG["SUBTOPIC"], "Rebooting Device...")
-    machine.reset()
+#def reset():
+ #   print("rebooting controller...")
+   # client.publish(CONFIG["SUBTOPIC"], "Rebooting Device...")
+  #  machine.deepsleep(5000)
     
 #Act based on received command & publish status of respective LED
 def onMessage(topic, msg):
@@ -50,8 +51,8 @@ def onMessage(topic, msg):
                     elif '0' in i and lst[j] in i:
                         gpiolist[j].off()
                         dictn[lst[j]]='0'
-                    elif 're' in i and lst[j] in i:
-                        reset()
+                    #elif 're' in i and lst[j] in i:
+                     #   reset()
                         
 #dictionary is converted to json data             
             message=json.dumps(dictn)
